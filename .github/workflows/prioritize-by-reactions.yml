@@ -1,0 +1,60 @@
+name: Prioritize Issues by Reactions
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # Runs daily at 5 AM UTC
+  workflow_dispatch:       # Allows manual runs
+
+jobs:
+  prioritize:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Prioritize issues by reactions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: tj-devel709/TestMauiTemplate
+          HIGH: 5
+          MEDIUM: 1
+          LOW: 0
+        run: |
+          issue_numbers=$(gh issue list -R "$REPO" --state open --json number -q '.[].number')
+
+          for ISSUE in $issue_numbers; do
+            echo "🔍 Checking Issue #$ISSUE"
+
+            reactions=$(curl -s \
+              -H "Accept: application/vnd.github.squirrel-girl-preview+json" \
+              -H "Authorization: token $GH_TOKEN" \
+              https://api.github.com/repos/$REPO/issues/$ISSUE/reactions)
+
+            total=$(echo "$reactions" | jq 'length')
+
+            if [ "$total" -ge "$HIGH" ]; then
+              priority="p/0"
+            elif [ "$total" -ge "$MEDIUM" ]; then
+              priority="p/1"
+            else
+              priority="p/2"
+            fi
+
+            echo "👉 Issue #$ISSUE has $total reactions — Assigning label: $priority"
+
+            # Remove existing p/* labels
+            for label in $(gh issue view $ISSUE -R $REPO --json labels -q '.labels[].name'); do
+              if [[ "$label" == p/* ]]; then
+                echo "   ⏹️  Removing old label: $label"
+                gh issue edit $ISSUE -R $REPO --remove-label "$label"
+              fi
+            done
+
+            echo "   ➕ Adding label: $priority"
+            gh issue edit $ISSUE -R $REPO --add-label "$priority"
+            echo ""
+          done
