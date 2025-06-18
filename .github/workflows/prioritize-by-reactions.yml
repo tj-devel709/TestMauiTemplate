@@ -2,7 +2,7 @@ name: Prioritize Issues by Reactions
 
 on:
   schedule:
-    - cron: '0 5 * * *'   # Runs daily at 5 AM UTC
+    - cron: '0 */4 * * *'   # Runs every 4 hours
   workflow_dispatch:       # Allows manual runs
 
 jobs:
@@ -48,15 +48,19 @@ jobs:
 
             echo "👉 Issue #$ISSUE has $total reactions — Assigning label: $priority"
 
-            # Remove existing p/* labels
-            for label in $(gh issue view $ISSUE -R $REPO --json labels -q '.labels[].name'); do
-              if [[ "$label" == p/* ]]; then
-                echo "   ⏹️  Removing old label: $label"
-                gh issue edit $ISSUE -R $REPO --remove-label "$label"
-              fi
-            done
+            # Get current p/* label (if any)
+            current_priority=$(gh issue view $ISSUE -R $REPO --json labels -q '.labels[].name' | grep '^p/' || echo "")
 
-            echo "   ➕ Adding label: $priority"
-            gh issue edit $ISSUE -R $REPO --add-label "$priority"
+            if [[ "$current_priority" != "$priority" ]]; then
+              if [[ -n "$current_priority" ]]; then
+                echo "   ⏹️  Removing old label: $current_priority"
+                gh issue edit $ISSUE -R $REPO --remove-label "$current_priority"
+              fi
+
+              echo "   ➕ Adding new label: $priority"
+              gh issue edit $ISSUE -R $REPO --add-label "$priority"
+            else
+              echo "   ✅ Priority label already correct: $priority"
+            fi
             echo ""
           done
