@@ -1,8 +1,8 @@
+---
 name: Issue Triage
 description: Assign label to new issues without a label
 resource: repository
 disabled: false
-
 configuration:
   resourceManagementConfiguration:
     eventResponderTasks:
@@ -12,8 +12,10 @@ configuration:
           - payloadType: Issues
           - and:
               - isOpen
+              - isAction:
+                  - action: opened
               - not:
-                  - or: 
+                  - or:
                       - hasLabel:
                           label: Bug
                       - hasLabel:
@@ -22,32 +24,34 @@ configuration:
                           label: SupportRequest
         then:
           - addReply:
-              reply: "@${issueAuthor}, please add a Bug/Feature/SupportRequest label as applicable."
+              reply: "@${issueAuthor}, please add a Bug/Feature/SupportRequest label as
+                applicable."
           - addLabel:
               label: waitingForCustomer
           - addLabel:
               label: untriaged
-      - description: Update issue if Type label was assigned # removes waitingForCustomer + untriaged if someone assigns a type label
+      - description: Update issue if Type label was assigned
         triggerOnOwnActions: false
-        if: 
+        if:
           - payloadType: Issues
+          - null
           - and:
-            - isOpen
-            - or: 
-              - labelAdded:
-                  label: Bug
-              - labelAdded:
-                  label: Feature
-              - labelAdded:
-                  label: SupportRequest
+              - isOpen
+              - or:
+                  - labelAdded:
+                      label: Bug
+                  - labelAdded:
+                      label: Feature
+                  - labelAdded:
+                      label: SupportRequest
         then:
-          - if: 
+          - if:
               - hasLabel:
                   label: untriaged
             then:
               - removeLabel:
                   label: untriaged
-          - if: 
+          - if:
               - not:
                   - hasLabel:
                       label: triaged
@@ -55,7 +59,7 @@ configuration:
               - addLabel:
                   label: triaged
           - if:
-              - hasLabel:
+              - hasLabel: null
                 label: waitingForCustomer
             then:
               - removeLabel:
@@ -66,8 +70,8 @@ configuration:
           - payloadType: Issues
           - and:
               - isOpen
-              - isAction::
-                  action: Issue_Comment # create or update (applies to issue description too?)
+              - "isAction:":
+                  action: Issue_Comment
         then:
           - if:
               - hasLabel:
@@ -76,11 +80,12 @@ configuration:
               - removeLabel:
                   label: stale
     scheduledSearches:
-      - description: search for issues that are waitingForCustomer and haven't got a response
+      - description: search for issues that are waitingForCustomer and haven't got a
+          response
         frequencies:
           - weekday:
-            - day: Monday
-            - time: 06:00
+              - day: Monday
+              - time: 06:00
         filters:
           - isOpen
           - hasLabel:
@@ -93,8 +98,8 @@ configuration:
       - description: close issues that are waitingForCustomer + stale for too long
         frequencies:
           - weekday:
-            - day: Monday
-            - time: 06:00
+              - day: Monday
+              - time: 06:00
         filters:
           - isOpen
           - hasLabel:
@@ -106,12 +111,14 @@ configuration:
         actions:
           - closeIssue
           - addReply:
-              reply: "@${issueAuthor}, this issue has been closed due to inactivity. Please feel free to reopen it if you have further information or questions."
+              reply: "@${issueAuthor}, this issue has been closed due to inactivity. Please
+                feel free to reopen it if you have further information or
+                questions."
       - description: close issues that have not received any activity in 18 months
         frequencies:
           - weekday:
-            - day: Monday
-            - time: 06:00
+              - day: Monday
+              - time: 06:00
         filters:
           - isOpen
           - noActivitySince:
@@ -119,4 +126,6 @@ configuration:
         actions:
           - closeIssue
           - addReply:
-              reply: "@${issueAuthor}, this issue has been closed due to inactivity. Please feel free to reopen it if you have further information or questions."
+              reply: "@${issueAuthor}, this issue has been closed due to inactivity. Please
+                feel free to reopen it if you have further information or
+                questions."
