@@ -1,8 +1,10 @@
----
-name: Issue Triage
-description: Assign label to new issues without a label
+id: 
+name: GitOps.PullRequestIssueManagement
+description: GitOps.PullRequestIssueManagement primitive
+owner: 
 resource: repository
 disabled: false
+where: 
 configuration:
   resourceManagementConfiguration:
     eventResponderTasks:
