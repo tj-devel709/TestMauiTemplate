@@ -21,10 +21,10 @@ jobs:
       - name: Prioritize issues by reactions
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: tj-devel709/TestMauiTemplate //microsoft/vsmarketplace
-          BUG_HIGH: 4 // 10
-          BUG_MEDIUM: 2 // 5
-          FEATURE_MEDIUM: 3 //25
+          REPO: tj-devel709/TestMauiTemplate # microsoft/vsmarketplace
+          BUG_HIGH: 4 # 10
+          BUG_MEDIUM: 2 # 5
+          FEATURE_MEDIUM: 3 # 25
         run: |
           issue_numbers=$(gh issue list -R "$REPO" --state open --json number -q '.[].number')
 
