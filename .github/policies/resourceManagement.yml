@@ -56,7 +56,7 @@ configuration:
       - description: Close issues that are 'Needs-Info' and 'Stale', and have not received any activity for 1 week
         frequencies:
           - daily:
-              time: 6:12
+              time: 06:25
         filters:
           - isOpen
           - noActivitySince:
@@ -65,8 +65,6 @@ configuration:
               label: Needs-Info
           - hasLabel:
               label: Stale
-          - isNotLabeledWith:
-              label: DoNotClose
         actions:
           - addReply:
               reply: "SHORT ISSUE CLOSE - ${issueAuthor}, this issue has been closed due to inactivity. Please feel free to reopen it if you have further information or questions."
@@ -74,17 +72,13 @@ configuration:
       - description: Warn the authors on issues that are 'Needs-Info', and have not received any activity for 1 week
         frequencies:
           - daily:
-              time: 6:12
+              time: 06:25
         filters:
           - isOpen
           - noActivitySince:
               days: 1
           - hasLabel:
               label: Needs-Info
-          - isNotLabeledWith:
-              label: DoNotClose
-          - isNotLabeledWith:
-              label: Stale
         actions:
           - addReply:
               reply: "${issueAuthor}, this issue will be closed soon due to inactivity. Please add more information to help us triage this issue."
@@ -93,17 +87,11 @@ configuration:
       - description: Close lower priority issues that have not received any activity for 18 months
         frequencies:
           - daily:
-              time: 6:12
+              time: 06:25
         filters:
           - isOpen
           - noActivitySince:
               days: 1
-          - isNotLabeledWith:
-              label: Priority:0
-          - isNotLabeledWith:
-              label: Priority:1
-          - isNotLabeledWith:
-              label: DoNotClose
         actions:
           - closeIssue
           - addReply:
