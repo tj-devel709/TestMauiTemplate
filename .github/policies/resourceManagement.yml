@@ -99,11 +99,9 @@ configuration:
       - description: Add label to testing
         frequencies:
           - daily:
-              time: 06:27
+              time: 06:40
         filters:
           - isOpen
-          - hasLabel
-              label: testing
         actions:
           - addReply:
               reply: "${issueAuthor}, Testing."
