@@ -96,3 +96,14 @@ configuration:
           - closeIssue
           - addReply:
               reply: "LONG ISSUE CLOSE - ${issueAuthor}, this issue has been closed due to inactivity. Please feel free to reopen it if you have further information or questions."
+      - description: Add label to testing
+        frequencies:
+          - daily:
+              time: 06:27
+        filters:
+          - isOpen
+          - hasLabel
+              label: testing
+        actions:
+          - addReply:
+              reply: "${issueAuthor}, Testing."
