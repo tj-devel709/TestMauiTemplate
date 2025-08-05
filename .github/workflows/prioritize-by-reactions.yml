@@ -21,7 +21,7 @@ jobs:
       - name: Prioritize issues by reactions
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: microsoft/vsmarketplace
+          REPO: tj-devel709/TestMauiTemplate
           BUG_HIGH: 10
           BUG_MEDIUM: 5
           FEATURE_MEDIUM: 25
